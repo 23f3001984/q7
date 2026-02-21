@@ -1,0 +1,28 @@
+name: Cache Priming Workflow
+
+on: [push, workflow_dispatch]
+
+jobs:
+  setup-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Create a dummy folder/file so there is something to actually cache.
+      - name: Generate Dummy Dependencies
+        run: |
+          mkdir -p .my-cache
+          echo "Simulating dependency data..." > .my-cache/data.txt
+
+      # 2. The required Cache action step
+      - name: Restore Cache
+        id: cache-step
+        uses: actions/cache@v4
+        with:
+          path: .my-cache
+          key: cache-b8f30a0
+
+      # 3. The required step named 'prime-cache-b8f30a0' that echoes the result
+      - name: prime-cache-b8f30a0
+        run: echo "Cache Hit Status: ${{ steps.cache-step.outputs.cache-hit }}"
